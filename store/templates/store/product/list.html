@@ -1,0 +1,76 @@
+{% extends "store/base.html" %}
+{% load store_extras %}
+{% load static %}
+
+{% block title %}
+    {% if category %}{{ category.name }}{% else %}All Products{% endif %}
+{% endblock %}
+
+{% block content %}
+    {% if category %}
+        {% if category.slug == 'ao' %}
+            {% with bg_url='https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=compress&w=1500&q=80' %}
+                {% include 'store/product/_hero_banner.html' %}
+            {% endwith %}
+        {% elif category.slug == 'quan' %}
+            {% with bg_url='https://images.unsplash.com/photo-1512436991641-6745cdb1723f?auto=compress&w=1500&q=80' %}
+                {% include 'store/product/_hero_banner.html' %}
+            {% endwith %}
+        {% elif category.slug == 'phu-kien' %}
+            {% with bg_url='https://images.unsplash.com/photo-1469398715555-76331a6c7c9b?auto=compress&w=1500&q=80' %}
+                {% include 'store/product/_hero_banner.html' %}
+            {% endwith %}
+        {% else %}
+            {% with bg_url='https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?auto=compress&w=1500&q=80' %}
+                {% include 'store/product/_hero_banner.html' %}
+            {% endwith %}
+        {% endif %}
+    {% else %}
+        {% with bg_url='https://images.unsplash.com/photo-1512436991641-6745cdb1723f?auto=compress&w=1500&q=80' %}
+            {% include 'store/product/_hero_banner.html' %}
+        {% endwith %}
+    {% endif %}
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h1 class="mb-0">{% if category %}{{ category.name }}{% else %}All Products{% endif %}</h1>
+            </div>
+            {% if query %}
+                <p>Kết quả tìm kiếm cho: <strong>{{ query }}</strong></p>
+            {% endif %}
+            <div class="row">
+                {% for product in products %}
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100">
+                        <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ product.name }}</h5>
+                            {% if product.discount_price %}
+                                <p class="card-text mb-1"><span class="text-muted text-decoration-line-through">{{ product.price|currency }}</span></p>
+                                <p class="card-text text-danger fw-bold">{{ product.discount_price|currency }}</p>
+                            {% else %}
+                                <p class="card-text">{{ product.price|currency }}</p>
+                            {% endif %}
+                            <div class="d-flex gap-2">
+                                <a href="{% url 'store:product_detail' product.id product.slug %}" class="btn btn-primary">Xem chi tiết</a>
+                                {% if user.is_authenticated %}
+                                <form method="post" action="{% url 'store:add_to_cart' product.id %}">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-success">Thêm vào giỏ</button>
+                                </form>
+                                {% else %}
+                                <a href="{% url 'accounts:login' %}?next={% url 'store:product_list' %}" class="btn btn-success">Thêm vào giỏ</a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="col-12">
+                    <p>Không tìm thấy sản phẩm nào.</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+{% endblock %} 

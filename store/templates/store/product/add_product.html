@@ -1,0 +1,12 @@
+{% extends 'store/base.html' %}
+{% block title %}Thêm sản phẩm mới{% endblock %}
+{% block content %}
+<div class="container mt-4">
+    <h2>Thêm sản phẩm mới</h2>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-success">Thêm sản phẩm</button>
+    </form>
+</div>
+{% endblock %} 

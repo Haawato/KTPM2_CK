@@ -1,0 +1,102 @@
+{% extends 'store/base.html' %}
+{% block title %}Vòng quay săn sale{% endblock %}
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 text-center">
+            <h2 class="mb-4">Vòng quay săn sale</h2>
+            <div id="wheel-container" class="mb-4">
+                <canvas id="wheel" width="350" height="350"></canvas>
+                <button id="spin-btn" class="btn btn-warning btn-lg mt-3">Quay ngay!</button>
+            </div>
+            <form id="spin-form" method="post" style="display:none;">{% csrf_token %}</form>
+            {% if result %}
+                <div class="alert {% if result.code %}alert-success{% else %}alert-secondary{% endif %} mt-3">
+                    <h4 class="mb-2">{{ result.label }}</h4>
+                    {% if result.code %}
+                        <p>Mã giảm giá của bạn: <strong>{{ result.code }}</strong></p>
+                        <p>Hãy lưu lại mã này và nhập khi thanh toán để nhận ưu đãi!</p>
+                    {% else %}
+                        <p>Chúc bạn may mắn lần sau!</p>
+                    {% endif %}
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+<script>
+const prizes = [
+    {label: 'Giảm 10%', color: '#FFD700'},
+    {label: 'Giảm 20%', color: '#FF9800'},
+    {label: 'Giảm 30%', color: '#FF5722'},
+    {label: 'Không trúng', color: '#BDBDBD'},
+    {label: 'Giảm 50%', color: '#4CAF50'},
+    {label: 'Không trúng', color: '#BDBDBD'}
+];
+const wheel = document.getElementById('wheel');
+const ctx = wheel.getContext('2d');
+const spinBtn = document.getElementById('spin-btn');
+const spinForm = document.getElementById('spin-form');
+let angle = 0;
+let spinning = false;
+
+function drawWheel() {
+    const num = prizes.length;
+    const arc = 2 * Math.PI / num;
+    for (let i = 0; i < num; i++) {
+        ctx.beginPath();
+        ctx.moveTo(175, 175);
+        ctx.arc(175, 175, 170, arc * i + angle, arc * (i + 1) + angle);
+        ctx.closePath();
+        ctx.fillStyle = prizes[i].color;
+        ctx.fill();
+        ctx.save();
+        ctx.translate(175, 175);
+        ctx.rotate(arc * (i + 0.5) + angle);
+        ctx.textAlign = 'right';
+        ctx.fillStyle = '#222';
+        ctx.font = 'bold 18px sans-serif';
+        ctx.fillText(prizes[i].label, 160, 10);
+        ctx.restore();
+    }
+    // Draw center
+    ctx.beginPath();
+    ctx.arc(175, 175, 60, 0, 2 * Math.PI);
+    ctx.fillStyle = '#fff';
+    ctx.fill();
+    ctx.stroke();
+    // Draw pointer
+    ctx.beginPath();
+    ctx.moveTo(175, 10);
+    ctx.lineTo(165, 40);
+    ctx.lineTo(185, 40);
+    ctx.closePath();
+    ctx.fillStyle = '#e65100';
+    ctx.fill();
+}
+drawWheel();
+
+spinBtn.onclick = function(e) {
+    if (spinning) return;
+    spinning = true;
+    let spins = Math.floor(Math.random() * 3) + 5; // 5-7 vòng
+    let prizeIndex = Math.floor(Math.random() * prizes.length);
+    let finalAngle = 2 * Math.PI * spins - (2 * Math.PI / prizes.length) * prizeIndex - Math.PI / prizes.length;
+    let current = 0;
+    let totalFrames = 120;
+    function animate() {
+        angle += (finalAngle - angle) / (totalFrames - current);
+        drawWheel();
+        current++;
+        if (current < totalFrames) {
+            requestAnimationFrame(animate);
+        } else {
+            spinning = false;
+            // Gửi form để lấy kết quả thật từ server
+            spinForm.submit();
+        }
+    }
+    animate();
+};
+</script>
+{% endblock %} 

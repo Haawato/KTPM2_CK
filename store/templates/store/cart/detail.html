@@ -1,0 +1,93 @@
+{% extends "store/base.html" %}
+{% load static %}
+{% load store_extras %}
+
+{% block title %}
+    Giỏ hàng của bạn
+{% endblock %}
+
+{% block content %}
+    <div class="container py-4">
+        <h1 class="mb-4 text-center"><i class="fas fa-shopping-cart text-primary me-2"></i>Giỏ hàng của bạn</h1>
+        {% if cart and cart.items.exists %}
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <form method="post" class="mb-3 d-flex gap-2 align-items-center justify-content-center flex-wrap">
+                    {% csrf_token %}
+                    <input type="text" name="discount_code" class="form-control" style="max-width:180px;" placeholder="Nhập mã giảm giá" value="{{ discount_code }}">
+                    <button type="submit" class="btn btn-outline-success"><i class="fas fa-tag"></i> Áp dụng</button>
+                    {% if discount_code %}
+                        <span class="badge bg-success">Đã áp dụng: {{ discount_code }} ({{ discount_percent }}%)</span>
+                    {% endif %}
+                </form>
+                <div class="table-responsive rounded shadow-sm">
+                    <table class="table align-middle bg-white rounded">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Ảnh</th>
+                                <th>Sản phẩm</th>
+                                <th class="text-center">Số lượng</th>
+                                <th>Đơn giá</th>
+                                <th>Tổng</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in cart.items.all %}
+                            <tr>
+                                <td style="width:80px">
+                                    <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}" class="img-thumbnail" style="width:64px; height:64px; object-fit:cover;">
+                                </td>
+                                <td>
+                                    <a href="{% url 'store:product_detail' item.product.id item.product.slug %}" class="fw-bold text-decoration-none text-dark">
+                                        {{ item.product.name }}
+                                    </a>
+                                </td>
+                                <td class="text-center">
+                                    <form method="post" action="{% url 'store:update_cart' item.id %}" class="d-inline-flex align-items-center justify-content-center">
+                                        {% csrf_token %}
+                                        <button type="submit" name="quantity" value="{{ item.quantity|add:'-1' }}" class="btn btn-outline-secondary btn-sm" {% if item.quantity <= 1 %}disabled{% endif %}><i class="fas fa-minus"></i></button>
+                                        <span class="mx-2">{{ item.quantity }}</span>
+                                        <button type="submit" name="quantity" value="{{ item.quantity|add:'1' }}" class="btn btn-outline-secondary btn-sm"><i class="fas fa-plus"></i></button>
+                                    </form>
+                                </td>
+                                <td>{{ item.product.price|currency }}</td>
+                                <td>{{ item.get_cost|currency }}</td>
+                                <td>
+                                    <a href="{% url 'store:remove_from_cart' item.id %}" class="btn btn-danger btn-sm"><i class="fas fa-trash-alt"></i></a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td colspan="4" class="text-end"><strong>Tổng cộng:</strong></td>
+                                <td colspan="2"><strong>{{ cart.get_total_price|currency }}</strong></td>
+                            </tr>
+                            {% if discount %}
+                            <tr>
+                                <td colspan="4" class="text-end text-danger"><strong>Giảm giá:</strong></td>
+                                <td colspan="2" class="text-danger">-{{ discount|currency }}</td>
+                            </tr>
+                            <tr>
+                                <td colspan="4" class="text-end"><strong>Thành tiền:</strong></td>
+                                <td colspan="2"><strong>{{ total_after_discount|currency }}</strong></td>
+                            </tr>
+                            {% endif %}
+                        </tfoot>
+                    </table>
+                </div>
+                <div class="text-end mt-4">
+                    <a href="{% url 'store:product_list' %}" class="btn btn-secondary"><i class="fas fa-arrow-left me-1"></i>Tiếp tục mua sắm</a>
+                    <a href="{% url 'store:checkout' %}" class="btn btn-primary"><i class="fas fa-credit-card me-1"></i>Thanh toán</a>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="alert alert-info text-center">
+            <i class="fas fa-info-circle"></i> Giỏ hàng của bạn đang trống.
+            <a href="{% url 'store:product_list' %}" class="alert-link">Tiếp tục mua sắm</a>
+        </div>
+        {% endif %}
+    </div>
+{% endblock %} 

@@ -1,0 +1,110 @@
+{% extends 'store/base.html' %}
+{% block title %}Trang chủ{% endblock %}
+{% block body_class %}home-bg{% endblock %}
+{% block content %}
+<style>
+body.home-bg {
+    background: #e3f2fd !important;
+}
+.snowflake {
+    position: fixed;
+    top: -40px;
+    color: #b3e5fc;
+    font-size: 1.1em;
+    pointer-events: none;
+    z-index: 1;
+    animation: fall linear infinite;
+    opacity: 0.85;
+}
+@keyframes fall {
+    to {
+        transform: translateY(110vh);
+    }
+}
+.hero-bg {
+    background: url('https://images.pexels.com/photos/34950/pexels-photo.jpg?auto=compress&w=1500&q=80') center center/cover no-repeat;
+    min-height: 420px;
+    position: relative;
+    border-radius: 18px;
+    overflow: hidden;
+}
+.hero-bg::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.45);
+}
+.hero-content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #fff;
+    text-align: center;
+    z-index: 2;
+    width: 100%;
+}
+.hero-title {
+    font-size: 2.5rem;
+    font-weight: bold;
+    margin-bottom: 18px;
+}
+.hero-search {
+    max-width: 500px;
+    margin: 0 auto;
+    display: flex;
+    background: #fff;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+.hero-search input {
+    border: none;
+    padding: 14px 16px;
+    flex: 1;
+    font-size: 1.1rem;
+    outline: none;
+}
+.hero-search button {
+    border: none;
+    background: #1976d2;
+    color: #fff;
+    padding: 0 24px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+.hero-search button:hover {
+    background: #0d47a1;
+}
+@media (max-width: 600px) {
+    .hero-title { font-size: 1.3rem; }
+    .hero-bg { min-height: 250px; }
+}
+</style>
+<script>
+// Snow effect
+for (let i = 0; i < 40; i++) {
+    let snow = document.createElement('span');
+    snow.className = 'snowflake';
+    snow.style.left = Math.random() * 100 + 'vw';
+    snow.style.animationDuration = (3 + Math.random() * 4) + 's';
+    snow.style.fontSize = (10 + Math.random() * 10) + 'px';
+    snow.innerHTML = '❄';
+    document.body.appendChild(snow);
+    setTimeout(() => snow.remove(), 8000);
+}
+</script>
+<div class="container mt-4">
+    <div class="hero-bg mb-5">
+        <div class="hero-content">
+            <div class="hero-title">Kho sản phẩm & ưu đãi thời trang tuyệt nhất cho bạn!</div>
+            <form class="hero-search" method="get" action="{% url 'store:product_list' %}">
+                <input type="text" name="q" placeholder="Tìm kiếm sản phẩm, thương hiệu...">
+                <button type="submit">Tìm kiếm</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %} 

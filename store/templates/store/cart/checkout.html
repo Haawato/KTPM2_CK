@@ -1,0 +1,75 @@
+{% extends "store/base.html" %}
+
+{% block title %}
+    Checkout
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <h1 class="mb-4 text-center"><i class="fas fa-credit-card text-primary me-2"></i>Thanh toán</h1>
+    <div class="row justify-content-center">
+        <div class="col-md-7 col-lg-6">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="fas fa-shipping-fast me-2"></i>Thông tin đặt hàng</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="full_name" class="form-label">Họ và tên</label>
+                            <input type="text" class="form-control" id="full_name" name="full_name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="email" name="email" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="phone" class="form-label">Số điện thoại</label>
+                            <input type="tel" class="form-control" id="phone" name="phone" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="address" class="form-label">Địa chỉ giao hàng</label>
+                            <textarea class="form-control" id="address" name="address" rows="3" required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100"><i class="fas fa-check-circle me-2"></i>Đặt hàng</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-5 col-lg-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0"><i class="fas fa-list me-2"></i>Đơn hàng của bạn</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table align-middle">
+                            <tbody>
+                                {% for item in cart.items.all %}
+                                <tr>
+                                    <td style="width:60px">
+                                        <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}" class="img-thumbnail" style="width:48px; height:48px; object-fit:cover;">
+                                    </td>
+                                    <td>
+                                        <span class="fw-bold">{{ item.product.name }}</span><br>
+                                        <span class="text-muted small">x {{ item.quantity }}</span>
+                                    </td>
+                                    <td class="text-end">{{ item.get_cost|currency }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <td colspan="2"><strong>Tổng cộng:</strong></td>
+                                    <td class="text-end"><strong>{{ cart.get_total_price|currency }}</strong></td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

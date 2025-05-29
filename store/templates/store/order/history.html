@@ -1,0 +1,43 @@
+{% extends "store/base.html" %}
+
+{% block title %}
+    My Orders
+{% endblock %}
+
+{% block content %}
+    <h1>My Orders</h1>
+    {% if orders %}
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Order ID</th>
+                    <th>Date</th>
+                    <th>Status</th>
+                    <th>Total</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for order in orders %}
+                <tr>
+                    <td>{{ order.id }}</td>
+                    <td>{{ order.created|date:"F j, Y" }}</td>
+                    <td>
+                        <span class="badge {% if order.status == 'delivered' %}bg-success{% elif order.status == 'shipped' %}bg-info{% elif order.status == 'processing' %}bg-warning{% else %}bg-secondary{% endif %}">
+                            {{ order.get_status_display }}
+                        </span>
+                    </td>
+                    <td>${{ order.total_amount }}</td>
+                    <td>
+                        <a href="{% url 'store:order_detail' order.id %}" class="btn btn-sm btn-primary">View Details</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <p>You haven't placed any orders yet.</p>
+    {% endif %}
+{% endblock %} 
